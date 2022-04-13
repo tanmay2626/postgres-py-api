@@ -128,7 +128,7 @@ def send_slack_message(channelType, userDetails):
 		print("In false")
 		pass
 
-# Todo - Need to figure out the logic to update the slack message (Add 2 inner functions [retrieve_msg_from_slack, send_update_to_slack] - these functions will retrieve information from slack and then update the new message content by attaching the changes to the retrieved msg) 
+# Todo - Incomplete function
 def update_slack_message(channelType, parent_msg_id, eventList):
 	channel = channelList[channelType]
 	logDNAExportURL = 'https://slack.com/api/chat.update'
@@ -150,20 +150,14 @@ def get_separate_event_list(logDNAEventList):
 	signUpEventList = {}
 	otherEventList = {}
 
-	# Loop for each log item and store in the resp. lists
 	for logItem in logDNAEventList:
-		# Strip the `[event]` word from the log line
-		logItemInside = logItem['message'].split(" ", 1)[1]
-		# Split the log line into event type and event message and strip leading spaces
+		logItemInside = logItem['message'].split("[event] ", 1)[1]
 		eventType, eventMessage = [x.strip() for x in logItemInside.split(":", 1)]
-		#  Split the event message into username and other data
 		user_name, eventMessage  = eventMessage.split(" ", 1)
 		if eventType == "signed_up":
-			# Split the event message between primary email and other emails
 			eventMessage = [x.replace('(','').replace(')','').replace(',','') for x in eventMessage.rsplit(' ', 2)[0].split(" ")]
 			user_primary_email = eventMessage[0]
 			user_other_email = eventMessage[1:]
-			# Add new key for user in the sign up event list
 			signUpEventList[user_name] = {
 				"name" : user_name,
 				"primary_email" : user_primary_email,
@@ -171,17 +165,11 @@ def get_separate_event_list(logDNAEventList):
 				"events" : []
 				}
 		else:
-			# Removing the Delay message from log line if present
-			# if(eventMessage[-2] == 's'):
-			# 	eventMessage = eventMessage.rsplit(' ', 2)[0]
-
-			# Create/Add new key for user and add event message to the array 
 			if user_name in otherEventList:
 				otherEventList[user_name].append(eventMessage)
 			else:
 				otherEventList[user_name] = [eventMessage]
 			
-			# Add events for user if user is present in sign up list
 			if user_name in signUpEventList:
 				signUpEventList[user_name]['events'].append(eventMessage)
 	
