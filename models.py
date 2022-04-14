@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ARRAY, DateTime
+from sqlalchemy import Column, Integer, String, ARRAY, DATE
 from database import Base
 
 
@@ -36,7 +36,7 @@ class Event(Base):
     __tablename__ = "event"
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(DateTime(timezone=True))
-    username = Column(String, unique=True, nullable=False)
-    events = Column(ARRAY(String))
+    date = Column(DATE, nullable=False)
+    username = Column(String, nullable=False)
+    events = Column(ARRAY(String), nullable=False)
     msg_id = Column(String, unique=True)

@@ -1,9 +1,11 @@
 import requests
 import json
+import crud
+from database import session
 
 channel_list = {
     'signup': 'C036L0W9R46',
-    'events': '',
+    'events': 'C036L0W9R46',
 }
 
 
@@ -74,6 +76,74 @@ def get_signup_content_block(user_details):
         }]
     }]
 
+def get_event_content_block(event_details):
+    user_name = event_details['username']
+    event_list = event_details['events']
+    user_last_activity_date = crud.get_user_last_activity_date(session, user_name)
+    # Todo - Get user signup date from DB
+    new_line = '\n'
+    return[
+		{
+			"color": "#396",
+			"blocks": [
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": f"<https://github.com/{user_name}|{user_name}> performed *{len(event_list)}* events today.\n\n*Last Activity*\n {user_last_activity_date}\n\n*Signed Up*\n {'x'} years ago"
+					},
+					"accessory": {
+						"type": "overflow",
+						"options": [
+							{
+								"text": {
+									"type": "plain_text",
+									"text": "GitHub Profile"
+								},
+								"url": f"https://github.com/{user_name}"
+							},
+							{
+								"text": {
+									"type": "plain_text",
+									"text": "Mixpanel Events"
+								},
+								"url": f"https://github.com/{user_name}"
+							},
+							{
+								"text": {
+									"type": "plain_text",
+									"text": "Fullstory Sessions"
+								},
+								"url": f"https://github.com/{user_name}"
+							}
+						]
+					}
+				},
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": f"*Events Today*\n{''.join([f'{new_line}•{x}' for x in event_list])}"
+					}
+				},
+				{
+					"type": "context",
+					"elements": [
+						{
+							"type": "image",
+							"image_url": "https://github.com/{user_name}.png",
+							"alt_text": "{user_name} avatar"
+						},
+						{
+							"type": "plain_text",
+							"text": "pymetrics Sep 2021 - Present"
+						}
+					]
+				}
+			]
+		}
+	]
+
 def fetch_log_data(from_time, to_time, pagination_id=None):
     local_data = []
     log_dna_export_url = 'https://api.logdna.com/v2/export'
@@ -103,8 +173,12 @@ def fetch_log_data(from_time, to_time, pagination_id=None):
     return local_data
 
 
-def send_slack_message(channel_type, user_details):
+def send_slack_message(channel_type, details):
     channel = channel_list[channel_type]
+    if channel_type == 'signup':
+        message_content = get_signup_content_block(details)
+    else:
+        message_content = get_event_content_block(details)
     slack_post_msg_url = 'https://slack.com/api/chat.postMessage'
     headers = {
         "Authorization":
@@ -112,7 +186,7 @@ def send_slack_message(channel_type, user_details):
     }
     data = {
         "channel": channel,
-        "attachments": json.dumps(get_signup_content_block(user_details))
+        "attachments": json.dumps(message_content)
     }
     response = requests.post(slack_post_msg_url, headers=headers, data=data)
     response_data = response.json()
@@ -123,8 +197,13 @@ def send_slack_message(channel_type, user_details):
         pass
 
 
-def update_slack_signup_message(channel_type, parent_msg_id, user_details):
+def update_slack_message(channel_type, parent_msg_id, details):
     channel = channel_list[channel_type]
+    if channel_type == 'signup':
+        message_content = get_signup_content_block(details)
+    else:
+        message_content = get_event_content_block(details)
+    
     slack_update_msg_url = 'https://slack.com/api/chat.update'
     headers = {
         "Authorization":
@@ -133,7 +212,7 @@ def update_slack_signup_message(channel_type, parent_msg_id, user_details):
     data = {
         "channel": channel,
         "ts": parent_msg_id,
-        "attachments": json.dumps(get_signup_content_block(user_details))
+        "attachments": json.dumps(message_content)
     }
     response = requests.post(slack_update_msg_url, headers=headers, data=data)
     response_data = response.json()
