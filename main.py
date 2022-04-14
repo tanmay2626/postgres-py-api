@@ -3,8 +3,6 @@ import helpers
 import crud
 import time
 
-Base.metadata.create_all(bind=engine)
-
 log_dba_events= helpers.fetch_log_data(1649684226, 1649862237)
 
 signup_events, other_events = helpers.get_separate_event_list(log_dba_events)
