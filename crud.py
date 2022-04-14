@@ -7,6 +7,8 @@ def create_user_signup_entry(db: Session, user_details):
     db_user = models.User(username=user_details['username'],
                           fullstory_link=user_details['fullstory_link'],
                           mixpanel_link=user_details['mixpanel_link'],
+                          primary_email=user_details['primary_email'],
+                          other_email=user_details['other_email'],
                           events=user_details['events'],
                           msg_id=user_details['msg_id'])
     db.add(db_user)

@@ -9,6 +9,8 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     fullstory_link = Column(String, nullable=True)
     mixpanel_link = Column(String, nullable=True)
+    primary_email = Column(String, nullable=True)
+    other_email = Column(ARRAY(String), nullable=True)
     events = Column(ARRAY(String), nullable=True)
     msg_id = Column(String, unique=True, nullable=False)
 

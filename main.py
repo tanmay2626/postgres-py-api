@@ -3,9 +3,9 @@ import helpers
 import crud
 import time
 
-log_dba_events = helpers.fetch_log_data(1649684226, 1649862237)
+log_dna_events = helpers.fetch_log_data(1649684226, 1649862237)
 
-signup_events, other_events = helpers.get_separate_event_list(log_dba_events)
+signup_events, other_events = helpers.get_separate_event_list(log_dna_events)
 
 for user in other_events:
     pass
