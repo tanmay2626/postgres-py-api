@@ -9,6 +9,7 @@ psycopg2 = "*"
 requests = "*"
 psycopg2-binary = "*"
 yapf = "*"
+pytest = "*"
 
 [dev-packages]
 
