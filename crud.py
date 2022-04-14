@@ -51,7 +51,7 @@ def update_user_events(db: Session, username: str, msg_id: str, events):
 
 def get_user_last_activity_date(db: Session, username: str):
     last_event_date = db.query(models.Event).filter(
-        models.Event.username == username).order_by(desc(models.Event.date)).limit(1).all()
+        models.Event.username == username).order_by(desc(models.Event.date)).limit(1).first()
     if last_event_date:
         return last_event_date.date
     else:
