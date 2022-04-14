@@ -8,6 +8,7 @@ sqlalchemy = "*"
 psycopg2 = "*"
 requests = "*"
 psycopg2-binary = "*"
+yapf = "*"
 
 [dev-packages]
 
