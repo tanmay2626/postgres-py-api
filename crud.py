@@ -2,13 +2,13 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 import models
 
-def create_user_signup_entry(db: Session, userDetails):
+def create_user_signup_entry(db: Session, user_details):
     db_user = models.User(
-        username=userDetails['username'], 
-        fullstory_link=userDetails['fullstory_link'], 
-        mixpanel_link=userDetails['mixpanel_link'], 
-        events = userDetails['events'],
-        msg_id = userDetails['msg_id'])
+        username=user_details['username'], 
+        fullstory_link=user_details['fullstory_link'], 
+        mixpanel_link=user_details['mixpanel_link'], 
+        events = user_details['events'],
+        msg_id = user_details['msg_id'])
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
