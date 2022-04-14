@@ -74,20 +74,6 @@ def get_signup_content_block(user_details):
         }]
     }]
 
-
-def get_signup_update_content_block(event_list):
-    new_line = '\n'
-    return {
-        "type": "section",
-        "text": {
-            "type":
-            "mrkdwn",
-            "text":
-            f"*First events*\n{''.join([f'{new_line}•{x}' for x in event_list])}"
-        }
-    }
-
-
 def fetch_log_data(from_time, to_time, pagination_id=None):
     local_data = []
     log_dna_export_url = 'https://api.logdna.com/v2/export'
@@ -119,7 +105,7 @@ def fetch_log_data(from_time, to_time, pagination_id=None):
 
 def send_slack_message(channel_type, user_details):
     channel = channel_list[channel_type]
-    log_dna_export_url = 'https://slack.com/api/chat.postMessage'
+    slack_post_msg_url = 'https://slack.com/api/chat.postMessage'
     headers = {
         "Authorization":
         "Bearer xoxb-3232981397716-3354861731686-fmcWNRZNxW1bgGW1XZOQBfa7"
@@ -128,7 +114,7 @@ def send_slack_message(channel_type, user_details):
         "channel": channel,
         "attachments": json.dumps(get_signup_content_block(user_details))
     }
-    response = requests.post(log_dna_export_url, headers=headers, data=data)
+    response = requests.post(slack_post_msg_url, headers=headers, data=data)
     response_data = response.json()
     if "ok" in response_data and response_data["ok"] is True:
         msg_id = response_data['ts']
@@ -137,10 +123,9 @@ def send_slack_message(channel_type, user_details):
         pass
 
 
-# Todo - Incomplete function
-def update_slack_message(channel_type, parent_msg_id, event_list):
+def update_slack_signup_message(channel_type, parent_msg_id, user_details):
     channel = channel_list[channel_type]
-    log_dna_export_url = 'https://slack.com/api/chat.update'
+    slack_update_msg_url = 'https://slack.com/api/chat.update'
     headers = {
         "Authorization":
         "Bearer xoxb-3232981397716-3354861731686-fmcWNRZNxW1bgGW1XZOQBfa7"
@@ -148,13 +133,12 @@ def update_slack_message(channel_type, parent_msg_id, event_list):
     data = {
         "channel": channel,
         "ts": parent_msg_id,
-        "attachments": json.dumps(get_signup_update_content_block(event_list))
+        "attachments": json.dumps(get_signup_content_block(user_details))
     }
-    response = requests.post(log_dna_export_url, headers=headers, data=data)
+    response = requests.post(slack_update_msg_url, headers=headers, data=data)
     response_data = response.json()
-    if "ok" in response_data == True:
-        msg_id = response_data['ts']
-        return msg_id
+    if "ok" in response_data and response_data["ok"] is True:
+        pass
     else:
         pass
 

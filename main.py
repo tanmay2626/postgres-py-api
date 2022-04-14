@@ -29,10 +29,13 @@ for user in other_events:
         new_events = other_events[user]
         user_data = crud.get_user_by_username(session, user)
         if user_data != None:
-            parent_msg_id = user_data.msg_id
-            old_events = user_data.events
+            user_data = user_data.toDict()
+            parent_msg_id = user_data['msg_id']
+            old_events = user_data['events']
             events_to_update = old_events + new_events[:10 - len(old_events)]
-            # Todo - update slack & DB
+            user_data['events'] = events_to_update
+            helpers.update_slack_signup_message('signup',parent_msg_id, user_data)
+            crud.update_user_signup_events(session, user_data['username'], user_data['events'])
         else:
             print(user + " not available !")
     time.sleep(1)
