@@ -2,6 +2,8 @@ import requests
 import json
 import crud
 from database import session
+from collections import OrderedDict
+import re
 
 channel_list = {
     'signup': 'C036L0W9R46',
@@ -216,23 +218,18 @@ def update_slack_message(channel_type, parent_msg_id, details):
         pass
 
 
-def get_separate_event_list(log_dna_event_list):
-    signup_events = {}
-    other_events = {}
-
+def separate_event_list(log_dna_event_list):
+    signup_events = OrderedDict()
+    other_events = OrderedDict()
     for log_item in log_dna_event_list:
-        log_item_inside = log_item['message'].split("[event] ", 1)[1]
-        event_type, event_message = [
-            x.strip() for x in log_item_inside.split(":", 1)
-        ]
+        log_message = log_item['message']
+        event_message = log_message[log_message.index(":")+1:].strip()
         user_name, event_message = event_message.split(" ", 1)
-        if event_type == "signed_up":
-            event_message = [
+        if "signed_up" in log_message:
+            user_primary_email, *user_other_email, _ = [
                 x.replace('(', '').replace(')', '').replace(',', '')
-                for x in event_message.rsplit(' ', 2)[0].split(" ")
+                for x in event_message.rsplit('signed up.', 1)[0].split(" ")
             ]
-            user_primary_email = event_message[0]
-            user_other_email = event_message[1:]
             signup_events[user_name] = {
                 "name": user_name,
                 "primary_email": user_primary_email,
@@ -244,8 +241,6 @@ def get_separate_event_list(log_dna_event_list):
                 other_events[user_name].append(event_message)
             else:
                 other_events[user_name] = [event_message]
-
             if user_name in signup_events:
                 signup_events[user_name]['events'].append(event_message)
-
     return (signup_events, other_events)

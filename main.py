@@ -6,7 +6,7 @@ import time
 
 log_dna_events = helpers.fetch_log_data(1649684226, 1649862237)
 
-signup_events, other_events = helpers.get_separate_event_list(log_dna_events)
+signup_events, other_events = helpers.separate_event_list(log_dna_events)
 
 for user in other_events:
     event_details = {
