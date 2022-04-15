@@ -1,5 +1,5 @@
 import pytest
-import helpers
+from app import helpers
 
 
 def test_get_separate_event_list():
