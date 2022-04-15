@@ -76,73 +76,70 @@ def get_signup_content_block(user_details):
         }]
     }]
 
+
 def get_event_content_block(event_details):
     user_name = event_details['username']
     event_list = event_details['events']
-    user_last_activity_date = crud.get_user_last_activity_date(session, user_name)
+    user_last_activity_date = crud.get_user_last_activity_date(
+        session, user_name)
     # Todo - Get user signup date from DB
     new_line = '\n'
-    return[
-		{
-			"color": "#396",
-			"blocks": [
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": f"<https://github.com/{user_name}|{user_name}> performed *{len(event_list)}* events today.\n\n*Last Activity*\n {user_last_activity_date}\n\n*Signed Up*\n {'x'} years ago"
-					},
-					"accessory": {
-						"type": "overflow",
-						"options": [
-							{
-								"text": {
-									"type": "plain_text",
-									"text": "GitHub Profile"
-								},
-								"url": f"https://github.com/{user_name}"
-							},
-							{
-								"text": {
-									"type": "plain_text",
-									"text": "Mixpanel Events"
-								},
-								"url": f"https://github.com/{user_name}"
-							},
-							{
-								"text": {
-									"type": "plain_text",
-									"text": "Fullstory Sessions"
-								},
-								"url": f"https://github.com/{user_name}"
-							}
-						]
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": f"*Events Today*\n{''.join([f'{new_line}•{x}' for x in event_list])}"
-					}
-				},
-				{
-					"type": "context",
-					"elements": [
-						{
-							"type": "image",
-							"image_url": "https://github.com/{user_name}.png",
-							"alt_text": "{user_name} avatar"
-						},
-						{
-							"type": "plain_text",
-							"text": "pymetrics Sep 2021 - Present"
-						}
-					]
-				}
-			]
-		}
-	]
+    return [{
+        "color":
+        "#396",
+        "blocks": [{
+            "type": "section",
+            "text": {
+                "type":
+                "mrkdwn",
+                "text":
+                f"<https://github.com/{user_name}|{user_name}> performed *{len(event_list)}* events today.\n\n*Last Activity*\n {user_last_activity_date}\n\n*Signed Up*\n {'x'} years ago"
+            },
+            "accessory": {
+                "type":
+                "overflow",
+                "options": [{
+                    "text": {
+                        "type": "plain_text",
+                        "text": "GitHub Profile"
+                    },
+                    "url": f"https://github.com/{user_name}"
+                }, {
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Mixpanel Events"
+                    },
+                    "url": f"https://github.com/{user_name}"
+                }, {
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Fullstory Sessions"
+                    },
+                    "url": f"https://github.com/{user_name}"
+                }]
+            }
+        }, {
+            "type": "section",
+            "text": {
+                "type":
+                "mrkdwn",
+                "text":
+                f"*Events Today*\n{''.join([f'{new_line}•{x}' for x in event_list])}"
+            }
+        }, {
+            "type":
+            "context",
+            "elements": [{
+                "type": "image",
+                "image_url": "https://github.com/{user_name}.png",
+                "alt_text": "{user_name} avatar"
+            }, {
+                "type": "plain_text",
+                "text": "pymetrics Sep 2021 - Present"
+            }]
+        }]
+    }]
+
 
 def fetch_log_data(from_time, to_time, pagination_id=None):
     local_data = []
@@ -184,10 +181,7 @@ def send_slack_message(channel_type, details):
         "Authorization":
         "Bearer xoxb-3232981397716-3354861731686-fmcWNRZNxW1bgGW1XZOQBfa7"
     }
-    data = {
-        "channel": channel,
-        "attachments": json.dumps(message_content)
-    }
+    data = {"channel": channel, "attachments": json.dumps(message_content)}
     response = requests.post(slack_post_msg_url, headers=headers, data=data)
     response_data = response.json()
     if "ok" in response_data and response_data["ok"] is True:
@@ -203,7 +197,7 @@ def update_slack_message(channel_type, parent_msg_id, details):
         message_content = get_signup_content_block(details)
     else:
         message_content = get_event_content_block(details)
-    
+
     slack_update_msg_url = 'https://slack.com/api/chat.update'
     headers = {
         "Authorization":

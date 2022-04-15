@@ -12,15 +12,16 @@ for user in other_events:
     event_details = {
         'username': user,
         'events': other_events[user],
-        'date' : datetime.datetime.today()
+        'date': datetime.datetime.today()
     }
-    event_data = crud.get_user_event_by_username(session, user, event_details['date'])
+    event_data = crud.get_user_event_by_username(session, user,
+                                                 event_details['date'])
     if event_data != None:
         # Todo
         # Send event as reply slack message to parent msg
         # Update parent msg with the data
-            # store in DB with new events
-            # send update slack msg
+        # store in DB with new events
+        # send update slack msg
         pass
     else:
         parent_msg_id = helpers.send_slack_message('events', event_details)
@@ -52,8 +53,9 @@ for user in other_events:
             old_events = user_data['events']
             events_to_update = old_events + new_events[:10 - len(old_events)]
             user_data['events'] = events_to_update
-            helpers.update_slack_message('signup',parent_msg_id, user_data)
-            crud.update_user_signup_events(session, user_data['username'], user_data['events'])
+            helpers.update_slack_message('signup', parent_msg_id, user_data)
+            crud.update_user_signup_events(session, user_data['username'],
+                                           user_data['events'])
         else:
             print(user + " not available !")
     time.sleep(1)

@@ -18,19 +18,19 @@ class User(Base):
         return "<User(id='%d, username='%s', fullstory_link='%s', mixpanel_link='%s, msg_id='%s')>" % (
             self.id, self.username, self.fullstory_link, self.mixpanel_link,
             self.msg_id)
-    
+
     def toDict(self):
         return {
-			'id': self.id,
-			'username': self.username,
-			'fullstory_link': self.fullstory_link,
-			'mixpanel_link': self.mixpanel_link,
-			'primary_email': self.primary_email,
-			'other_email': self.other_email,
-			'events': self.events,
-			'msg_id': self.msg_id,
+            'id': self.id,
+            'username': self.username,
+            'fullstory_link': self.fullstory_link,
+            'mixpanel_link': self.mixpanel_link,
+            'primary_email': self.primary_email,
+            'other_email': self.other_email,
+            'events': self.events,
+            'msg_id': self.msg_id,
+        }
 
-            }
 
 class Event(Base):
     __tablename__ = "event"
