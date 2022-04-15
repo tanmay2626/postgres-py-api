@@ -223,7 +223,7 @@ def separate_event_list(log_dna_event_list):
     other_events = OrderedDict()
     for log_item in log_dna_event_list:
         log_message = log_item['message']
-        event_message = log_message[log_message.index(":")+1:].strip()
+        event_message = log_message[log_message.index(":") + 1:].strip()
         user_name, event_message = event_message.split(" ", 1)
         if "signed_up" in log_message:
             user_primary_email, *user_other_email, _ = [

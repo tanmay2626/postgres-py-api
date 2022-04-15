@@ -35,8 +35,7 @@ def test_get_separate_event_list():
     }
 
     #act
-    (signup_events,
-     other_events) = helpers.separate_event_list(log_dna_events)
+    (signup_events, other_events) = helpers.separate_event_list(log_dna_events)
 
     #assert
     assert signup_events == expected_signup_events
