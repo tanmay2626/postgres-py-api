@@ -3,7 +3,6 @@ import json
 from app.crud import get_user_last_activity_date
 from app.database import session
 from collections import OrderedDict
-import re
 
 channel_list = {
     'signup': 'C036L0W9R46',
@@ -82,6 +81,7 @@ def get_signup_content_block(user_details):
 def get_event_content_block(event_details):
     user_name = event_details['username']
     event_list = event_details['events']
+    parent_events_count = event_details['parent_event_count']
     user_last_activity_date = get_user_last_activity_date(
         session, user_name)
     # Todo - Get user signup date from DB
@@ -126,7 +126,7 @@ def get_event_content_block(event_details):
                 "type":
                 "mrkdwn",
                 "text":
-                f"*Events Today*\n{''.join([f'{new_line}•{x}' for x in event_list])}"
+                f"*Events Today*\n{''.join([f'{new_line}•{x}' for x in event_list[:parent_events_count]])}"
             }
         }, {
             "type":
@@ -142,6 +142,22 @@ def get_event_content_block(event_details):
         }]
     }]
 
+def get_event_reply_content_block(event_list):
+    new_line = '\n'
+    return [
+		{
+			"color": "#396",
+			"blocks": [
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": f"{''.join([f'{new_line}•{x}' for x in event_list])}"
+					}
+				}
+			]
+		}
+	]
 
 def fetch_log_data(from_time, to_time, pagination_id=None):
     local_data = []
@@ -192,6 +208,22 @@ def send_slack_message(channel_type, details):
     else:
         pass
 
+def send_slack_reply_message(channel_type, parent_msg_id, events_list):
+    channel = channel_list[channel_type]
+    message_content = get_event_reply_content_block(events_list)
+    slack_post_msg_url = 'https://slack.com/api/chat.postMessage'
+    headers = {
+        "Authorization":
+        "Bearer xoxb-3232981397716-3354861731686-fmcWNRZNxW1bgGW1XZOQBfa7"
+    }
+    data = {"channel": channel, "thread_ts": parent_msg_id, "attachments": json.dumps(message_content)}
+    response = requests.post(slack_post_msg_url, headers=headers, data=data)
+    response_data = response.json()
+    if "ok" in response_data and response_data["ok"] is True:
+        msg_id = response_data['ts']
+        return msg_id
+    else:
+        pass
 
 def update_slack_message(channel_type, parent_msg_id, details):
     channel = channel_list[channel_type]
