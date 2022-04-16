@@ -1,7 +1,7 @@
 from app.database import session, Base, engine
 import datetime
 from app.helpers import fetch_log_data, separate_event_list, send_slack_message, update_slack_message
-from app.crud import get_user_event_by_username, create_user_event, get_user_by_username, update_user_signup_events
+from app.crud import get_user_event_by_username, create_user_event, get_user_by_username, update_user_signup_events, create_user_signup_entry
 import time
 
 log_dna_events = fetch_log_data(1649684226, 1649862237)
