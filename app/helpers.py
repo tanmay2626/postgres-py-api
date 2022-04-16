@@ -1,7 +1,7 @@
 import requests
 import json
-import crud
-from database import session
+from app.crud import get_user_last_activity_date
+from app.database import session
 from collections import OrderedDict
 import re
 
@@ -82,7 +82,7 @@ def get_signup_content_block(user_details):
 def get_event_content_block(event_details):
     user_name = event_details['username']
     event_list = event_details['events']
-    user_last_activity_date = crud.get_user_last_activity_date(
+    user_last_activity_date = get_user_last_activity_date(
         session, user_name)
     # Todo - Get user signup date from DB
     new_line = '\n'

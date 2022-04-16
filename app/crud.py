@@ -1,10 +1,10 @@
 from sqlalchemy import func, desc
 from sqlalchemy.orm import Session
-import models
+from app.models import User, Event
 
 
 def create_user_signup_entry(db: Session, user_details):
-    db_user = models.User(username=user_details['username'],
+    db_user = User(username=user_details['username'],
                           fullstory_link=user_details['fullstory_link'],
                           mixpanel_link=user_details['mixpanel_link'],
                           primary_email=user_details['primary_email'],
@@ -18,20 +18,20 @@ def create_user_signup_entry(db: Session, user_details):
 
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(models.User).filter(
-        models.User.username == username,
-        func.cardinality(models.User.events) < 10).first()
+    return db.query(User).filter(
+        User.username == username,
+        func.cardinality(User.events) < 10).first()
 
 
 def update_user_signup_events(db: Session, username: str, events):
     user = db.query(
-        models.User).filter(models.User.username == username).first()
+        User).filter(User.username == username).first()
     user.events = events
     db.commit()
 
 
 def create_user_event(db: Session, event_details):
-    db_event = models.Event(username=event_details['username'],
+    db_event = Event(username=event_details['username'],
                             date=event_details['date'],
                             events=event_details['events'],
                             msg_id=event_details['msg_id'])
@@ -42,22 +42,22 @@ def create_user_event(db: Session, event_details):
 
 
 def get_user_event_by_username(db: Session, username: str, date):
-    return db.query(models.Event).filter(models.Event.username == username,
-                                         models.Event.date == date).first()
+    return db.query(Event).filter(Event.username == username,
+                                         Event.date == date).first()
 
 
 def update_user_events(db: Session, username: str, msg_id: str, events):
-    user_event = db.query(models.Event).filter(
-        models.Event.username == username,
-        models.Event.msg_id == msg_id).first()
+    user_event = db.query(Event).filter(
+        Event.username == username,
+        Event.msg_id == msg_id).first()
     user_event.events = events
     db.commit()
 
 
 def get_user_last_activity_date(db: Session, username: str):
     last_event_date = db.query(
-        models.Event).filter(models.Event.username == username).order_by(
-            desc(models.Event.date)).limit(1).first()
+        Event).filter(Event.username == username).order_by(
+            desc(Event.date)).limit(1).first()
     if last_event_date:
         return last_event_date.date
     else:
