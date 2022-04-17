@@ -81,7 +81,7 @@ def send_slack_message(channel_type, details):
     try:
         result = client.chat_postMessage(
             channel=channel, attachments=message_content["attachments"])
-        return result.get("thread_ts")
+        return result.get("ts")
     except SlackApiError as e:
         print(f"Error: {e}")
         return None
@@ -118,7 +118,7 @@ def update_slack_message(channel_type, parent_msg_id, details):
             channel=channel,
             ts=parent_msg_id,
             attachments=message_content["attachments"])
-        return result.get("thread_ts")
+        return result.get("ts")
     except SlackApiError as e:
         print(f"Error: {e}")
         return None
