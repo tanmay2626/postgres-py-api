@@ -15,7 +15,7 @@ for user in other_events:
         'date': datetime.datetime.today()
     }
     event_data = get_user_event_by_username(session, user,
-                                                 event_details['date'])
+                                            event_details['date'])
     if event_data != None:
         # Todo
         # Send event as reply slack message to parent msg
@@ -42,8 +42,9 @@ for user in other_events:
         # Todo - Make call to Fullstory API to get the details
         # Todo - Make call to Mixpanel API to get the details
         parent_msg_id = send_slack_message('signup', user_details)
-        user_details['msg_id'] = parent_msg_id
-        create_user_signup_entry(session, user_details)
+        if parent_msg_id != None:
+            user_details['msg_id'] = parent_msg_id
+            create_user_signup_entry(session, user_details)
     else:
         new_events = other_events[user]
         user_data = get_user_by_username(session, user)
@@ -55,7 +56,7 @@ for user in other_events:
             user_data['events'] = events_to_update
             update_slack_message('signup', parent_msg_id, user_data)
             update_user_signup_events(session, user_data['username'],
-                                           user_data['events'])
+                                      user_data['events'])
         else:
             print(user + " not available !")
     time.sleep(1)

@@ -10,6 +10,7 @@ requests = "*"
 psycopg2-binary = "*"
 yapf = "*"
 pytest = "*"
+slack-sdk = "*"
 
 [dev-packages]
 
