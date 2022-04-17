@@ -30,6 +30,21 @@ def get_event_content_block(event_details):
     return event_message(event_details, user_last_activity_date)
 
 
+def get_event_reply_content_block(event_list):
+    new_line = '\n'
+    return [{
+        "color":
+        "#396",
+        "blocks": [{
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"{''.join([f'{new_line}•{x}' for x in event_list])}"
+            }
+        }]
+    }]
+
+
 def fetch_log_data(from_time, to_time, pagination_id=None):
     local_data = []
     log_dna_export_url = 'https://api.logdna.com/v2/export'
@@ -70,6 +85,28 @@ def send_slack_message(channel_type, details):
     except SlackApiError as e:
         print(f"Error: {e}")
         return None
+
+
+def send_slack_reply_message(channel_type, parent_msg_id, events_list):
+    channel = channel_list[channel_type]
+    message_content = get_event_reply_content_block(events_list)
+    slack_post_msg_url = 'https://slack.com/api/chat.postMessage'
+    headers = {
+        "Authorization":
+        "Bearer xoxb-3232981397716-3354861731686-fmcWNRZNxW1bgGW1XZOQBfa7"
+    }
+    data = {
+        "channel": channel,
+        "thread_ts": parent_msg_id,
+        "attachments": json.dumps(message_content)
+    }
+    response = requests.post(slack_post_msg_url, headers=headers, data=data)
+    response_data = response.json()
+    if "ok" in response_data and response_data["ok"] is True:
+        msg_id = response_data['ts']
+        return msg_id
+    else:
+        pass
 
 
 def update_slack_message(channel_type, parent_msg_id, details):

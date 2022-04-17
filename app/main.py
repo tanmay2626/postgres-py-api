@@ -1,7 +1,7 @@
 from app.database import session, Base, engine
 import datetime
-from app.helpers import fetch_log_data, separate_event_list, send_slack_message, update_slack_message
-from app.crud import get_user_event_by_username, create_user_event, get_user_by_username, update_user_signup_events, create_user_signup_entry
+from app.helpers import fetch_log_data, separate_event_list, send_slack_message, update_slack_message, send_slack_reply_message
+from app.crud import get_user_event_by_username, create_user_event, get_user_by_username, update_user_signup_events, create_user_signup_entry, update_user_events
 import time
 
 log_dna_events = fetch_log_data(1649684226, 1649862237)
@@ -12,17 +12,21 @@ for user in other_events:
     event_details = {
         'username': user,
         'events': other_events[user],
-        'date': datetime.datetime.today()
+        'parent_event_count': len(other_events[user]),
+        'date': datetime.date.today()
     }
-    event_data = get_user_event_by_username(session, user,
-                                            event_details['date'])
-    if event_data != None:
-        # Todo
-        # Send event as reply slack message to parent msg
-        # Update parent msg with the data
-        # store in DB with new events
-        # send update slack msg
-        pass
+    existing_event_data = get_user_event_by_username(session, user,
+                                                     event_details['date'])
+    if existing_event_data != None:
+        existing_event_data = existing_event_data.toDict()
+        parent_msg_id = existing_event_data['msg_id']
+        event_list = event_details['events']
+        send_slack_reply_message('events', parent_msg_id, event_list)
+        time.sleep(1)
+        existing_event_data[
+            'events'] = existing_event_data['events'] + event_list
+        update_slack_message('events', parent_msg_id, existing_event_data)
+        update_user_events(session, existing_event_data)
     else:
         parent_msg_id = send_slack_message('events', event_details)
         event_details['msg_id'] = parent_msg_id

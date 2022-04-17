@@ -48,7 +48,7 @@ def event_message(event_details, user_last_activity_date):
                     "type":
                     "mrkdwn",
                     "text":
-                    f"*Events Today*\n{''.join([f'{new_line}•{x}' for x in event_details['events']])}"
+                    f"*Events Today*\n{''.join([f'{new_line}•{x}' for x in (event_details['events'])[:event_details['parent_event_count']]])}"
                 }
             }, {
                 "type":

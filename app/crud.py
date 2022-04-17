@@ -31,6 +31,7 @@ def update_user_signup_events(db: Session, username: str, events):
 def create_user_event(db: Session, event_details):
     db_event = Event(username=event_details['username'],
                      date=event_details['date'],
+                     parent_event_count=event_details['parent_event_count'],
                      events=event_details['events'],
                      msg_id=event_details['msg_id'])
     db.add(db_event)
@@ -44,10 +45,11 @@ def get_user_event_by_username(db: Session, username: str, date):
                                   Event.date == date).first()
 
 
-def update_user_events(db: Session, username: str, msg_id: str, events):
-    user_event = db.query(Event).filter(Event.username == username,
-                                        Event.msg_id == msg_id).first()
-    user_event.events = events
+def update_user_events(db: Session, event_details):
+    user_event = db.query(Event).filter(
+        Event.username == event_details['username'],
+        Event.msg_id == event_details['msg_id']).first()
+    user_event.events = event_details['events']
     db.commit()
 
 

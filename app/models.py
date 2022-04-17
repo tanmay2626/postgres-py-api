@@ -38,5 +38,16 @@ class Event(Base):
     id = Column(Integer, primary_key=True, index=True)
     date = Column(DATE, nullable=False)
     username = Column(String, nullable=False)
+    parent_event_count = Column(Integer, nullable=False)
     events = Column(ARRAY(String), nullable=False)
     msg_id = Column(String, unique=True)
+
+    def toDict(self):
+        return {
+            'id': self.id,
+            'date': self.date,
+            'username': self.username,
+            'events': self.events,
+            'parent_event_count': self.parent_event_count,
+            'msg_id': self.msg_id,
+        }
