@@ -8,14 +8,19 @@ from slack_sdk.errors import SlackApiError
 from app.templates.signup import signup_message
 from app.templates.event import event_message
 import re
+import os
+
+signup_channel_id = os.getenv('SIGNUP_CHANNEL_ID')
+event_channel_id = os.getenv('EVENT_CHANNEL_ID')
+slack_bot_auth = os.getenv('SLACK_BOT_AUTH')
+bearer_token = os.getenv('BEARER_TOKEN')
 
 channel_list = {
-    'signup': 'C036L0W9R46',
-    'events': 'C036L0W9R46',
+    'signup': signup_channel_id,
+    'events': event_channel_id,
 }
 
-client = WebClient(
-    token="xoxb-3232981397716-3354861731686-fmcWNRZNxW1bgGW1XZOQBfa7")
+client = WebClient(token=bearer_token)
 
 
 def get_signup_content_block(user_details):
@@ -59,8 +64,7 @@ def fetch_log_data(from_time, to_time, pagination_id=None):
     }
     response = requests.get(log_dna_export_url,
                             params=params,
-                            auth=('slack-bot',
-                                  'd36cf2076a8f4e61a1f1cec926ed1ff5'))
+                            auth=('slack-bot', slack_bot_auth))
     log_data = response.json()
 
     local_data.extend(log_data['lines'])
@@ -91,10 +95,7 @@ def send_slack_reply_message(channel_type, parent_msg_id, events_list):
     channel = channel_list[channel_type]
     message_content = get_event_reply_content_block(events_list)
     slack_post_msg_url = 'https://slack.com/api/chat.postMessage'
-    headers = {
-        "Authorization":
-        "Bearer xoxb-3232981397716-3354861731686-fmcWNRZNxW1bgGW1XZOQBfa7"
-    }
+    headers = {"Authorization": "Bearer " + bearer_token}
     data = {
         "channel": channel,
         "thread_ts": parent_msg_id,
