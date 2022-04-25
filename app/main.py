@@ -4,7 +4,8 @@ from app.helpers import fetch_log_data, separate_event_list, send_slack_message,
 from app.crud import get_user_event_by_username, create_user_event, get_user_by_username, update_user_signup_events, create_user_signup_entry, update_user_events
 import time
 
-def process(signup_events,other_events):
+def process():
+    signup_events, other_events = separate_event_list(log_dna_events)
     process_other_events(other_events)
     process_signin_events(signup_events,other_events)
 
@@ -69,6 +70,5 @@ def process_signin_events(signup_events,other_events):
 
 if __name__ == "__main__":
     log_dna_events = fetch_log_data(1650782283, 165082571)
-    signup_events, other_events = separate_event_list(log_dna_events)
-    process(signup_events,other_events)
+    process()
     
