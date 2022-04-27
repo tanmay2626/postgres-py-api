@@ -1,7 +1,7 @@
 import requests
 import json
 from app.crud import get_user_last_activity_date
-from app.database import session
+from app.database import connection
 from collections import OrderedDict
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -29,7 +29,7 @@ def get_signup_content_block(user_details):
 
 def get_event_content_block(event_details):
     user_last_activity_date = get_user_last_activity_date(
-        session, event_details['username'])
+        connection.session, event_details['username'])
     # Todo - Get user signup date from DB
     new_line = '\n'
     return event_message(event_details, user_last_activity_date)
@@ -58,7 +58,7 @@ def fetch_log_data(from_time, to_time, pagination_id=None):
         'to': to_time,
         'size': 100,
         'query':
-        'host:codecrafters-server app:app[web] [event] -host:codecrafters-server-stg',
+        'host:codecrafters-server app:app[worker] [analytics_event] -host:codecrafters-server-stg',
         'prefer': 'head',
         'pagination_id': pagination_id
     }
