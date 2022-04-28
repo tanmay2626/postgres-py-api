@@ -47,5 +47,5 @@ def test_slack_output_expected_behaviour(setup, mocker):
     call2 = mocker.call(channel=config.event_channel_id, attachments=event_message(event_details_user2, None)["attachments"])
     call3 = mocker.call(channel=config.signup_channel_id, attachments=signup_message(user_details_user1)["attachments"])
     
-    client.chat_postMessage.assert_has_calls([call1,call2,call3],any_order=True)
+    client.chat_postMessage.assert_has_calls([call1,call2,call3])
     assert client.chat_postMessage.call_count == 3
