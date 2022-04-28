@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, ARRAY, DATE
+from sqlalchemy import Column, Integer, String, ARRAY, DATE, Enum, DateTime, func
+from sqlalchemy.sql.schema import Identity
 from sqlalchemy.ext.declarative import declarative_base
+import enum
 
 Base = declarative_base()
 
@@ -53,3 +55,19 @@ class Event(Base):
             'parent_event_count': self.parent_event_count,
             'msg_id': self.msg_id,
         }
+
+class statusEnum(enum.Enum):
+    running = 0
+    fail = 1
+    success = 2
+
+
+class Job(Base):
+    __tablename__ = "job"
+
+    id = Column(Integer, Identity(start=1), primary_key=True, index=True)
+    start_time = Column(DateTime(timezone=True), default=func.now())
+    end_time = Column(DateTime(timezone=True), default=func.now())
+    logdna_start_time = Column(DateTime(timezone=True), default=func.now())
+    logdna_end_time = Column(DateTime(timezone=True), default=func.now())
+    status = Column('status', Enum(statusEnum))
