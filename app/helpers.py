@@ -7,6 +7,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from app.templates.signup import signup_message
 from app.templates.event import event_message
+from app.templates.event_reply import event_reply
 import re
 from app.config import config
 
@@ -30,19 +31,8 @@ def get_event_content_block(event_details):
     return event_message(event_details, user_last_activity_date)
 
 
-def get_event_reply_content_block(event_list):
-    new_line = '\n'
-    return [{
-        "color":
-        "#396",
-        "blocks": [{
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": f"{''.join([f'{new_line}•{x}' for x in event_list])}"
-            }
-        }]
-    }]
+def get_event_reply_content_block(event_details):
+    return event_reply(event_details)
 
 
 def fetch_log_data(from_time, to_time, pagination_id=None):
@@ -86,23 +76,18 @@ def send_slack_message(channel_type, details):
         return None
 
 
-def send_slack_reply_message(channel_type, parent_msg_id, events_list):
+def send_slack_reply_message(channel_type, parent_msg_id, event_details):
     channel = channel_list[channel_type]
-    message_content = get_event_reply_content_block(events_list)
-    slack_post_msg_url = 'https://slack.com/api/chat.postMessage'
-    headers = {"Authorization": "Bearer " + config.bearer_token}
-    data = {
-        "channel": channel,
-        "thread_ts": parent_msg_id,
-        "attachments": json.dumps(message_content)
-    }
-    response = requests.post(slack_post_msg_url, headers=headers, data=data)
-    response_data = response.json()
-    if "ok" in response_data and response_data["ok"] is True:
-        msg_id = response_data['ts']
-        return msg_id
-    else:
-        pass
+    message_content = get_event_reply_content_block(event_details)
+    try:
+        result = client.chat_postMessage(
+            channel=channel,
+            ts=parent_msg_id,
+            attachments=message_content["attachments"])
+        return result.get("ts")
+    except SlackApiError as e:
+        print(f"Error: {e}")
+        return None
 
 
 def update_slack_message(channel_type, parent_msg_id, details):

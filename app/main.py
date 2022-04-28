@@ -26,7 +26,7 @@ def process_other_events(other_events):
             existing_event_data = existing_event_data.toDict()
             parent_msg_id = existing_event_data['msg_id']
             event_list = event_details['events']
-            send_slack_reply_message('events', parent_msg_id, event_list)
+            send_slack_reply_message('events', parent_msg_id, event_details)
             time.sleep(1)
             existing_event_data[
                 'events'] = existing_event_data['events'] + event_list
