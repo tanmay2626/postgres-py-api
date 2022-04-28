@@ -16,6 +16,7 @@ python-dotenv = "*"
 pytest-mock = "*"
 pytest = "*"
 mock = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.7"
