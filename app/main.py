@@ -5,10 +5,12 @@ from app.crud import get_user_event_by_username, create_user_event, get_user_by_
 import time
 from dotenv import load_dotenv
 
+
 def process(log_dna_events):
     signup_events, other_events = separate_event_list(log_dna_events)
     process_other_events(other_events)
-    process_signin_events(signup_events,other_events)
+    process_signin_events(signup_events, other_events)
+
 
 def process_other_events(other_events):
     for user in other_events:
@@ -18,8 +20,8 @@ def process_other_events(other_events):
             'parent_event_count': len(other_events[user]),
             'date': datetime.date.today()
         }
-        existing_event_data = get_user_event_by_username(connection.session, user,
-                                                        event_details['date'])
+        existing_event_data = get_user_event_by_username(
+            connection.session, user, event_details['date'])
         if existing_event_data != None:
             existing_event_data = existing_event_data.toDict()
             parent_msg_id = existing_event_data['msg_id']
@@ -36,7 +38,8 @@ def process_other_events(other_events):
             create_user_event(connection.session, event_details)
         time.sleep(1)
 
-def process_signin_events(signup_events,other_events):
+
+def process_signin_events(signup_events, other_events):
     for user in other_events:
         if user in signup_events:
             user_details = {
@@ -60,18 +63,19 @@ def process_signin_events(signup_events,other_events):
                 user_data = user_data.toDict()
                 parent_msg_id = user_data['msg_id']
                 old_events = user_data['events']
-                events_to_update = old_events + new_events[:10 - len(old_events)]
+                events_to_update = old_events + new_events[:10 -
+                                                           len(old_events)]
                 user_data['events'] = events_to_update
                 update_slack_message('signup', parent_msg_id, user_data)
-                update_user_signup_events(connection.session, user_data['username'],
-                                        user_data['events'])
+                update_user_signup_events(connection.session,
+                                          user_data['username'],
+                                          user_data['events'])
             else:
                 print(user + " not available !")
         time.sleep(1)
 
+
 if __name__ == "__main__":
-    load_dotenv()
     connection.init()
-    log_dna_events = fetch_log_data(1650782283, 165082571)
+    log_dna_events = fetch_log_data(1650890663, 1650977063)
     process(log_dna_events)
-    

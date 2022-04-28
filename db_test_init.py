@@ -1,7 +1,9 @@
-from dotenv import load_dotenv
+import os
+
+os.environ["ENV"] = "test"
+
 from app.models import Base
 from app.database import connection
 
-load_dotenv('.env.test')
 connection.init()
 Base.metadata.create_all(bind=connection.engine)
