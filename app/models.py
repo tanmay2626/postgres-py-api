@@ -56,6 +56,7 @@ class Event(Base):
             'msg_id': self.msg_id,
         }
 
+
 class statusEnum(enum.Enum):
     running = 0
     fail = 1
