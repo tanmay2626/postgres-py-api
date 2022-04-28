@@ -9,11 +9,13 @@ psycopg2 = "*"
 requests = "*"
 psycopg2-binary = "*"
 yapf = "*"
-pytest = "*"
 slack-sdk = "*"
 python-dotenv = "*"
 
 [dev-packages]
+pytest-mock = "*"
+pytest = "*"
+mock = "*"
 
 [requires]
 python_version = "3.7"
