@@ -42,33 +42,6 @@ def signup_message(user_details):
                     },
                     "url":
                     f"https://github.com/{user_details['username']}"
-                }, {
-                    "type":
-                    "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Mixpanel Events"
-                    },
-                    "url":
-                    f"https://github.com/{user_details['username']}"
-                }, {
-                    "type":
-                    "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Fullstory Sessions"
-                    },
-                    "url":
-                    f"https://github.com/{user_details['username']}"
-                }]
-            }, {
-                "type":
-                "context",
-                "elements": [{
-                    "type":
-                    "plain_text",
-                    "text":
-                    "pymetrics Sep 2021 - Present | Bluecore Nov 2020 - Sep 2021"
                 }]
             }]
         }]

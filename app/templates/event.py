@@ -26,20 +26,6 @@ def event_message(event_details, user_last_activity_date):
                         },
                         "url":
                         f"https://github.com/{event_details['username']}"
-                    }, {
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Mixpanel Events"
-                        },
-                        "url":
-                        f"https://github.com/{event_details['username']}"
-                    }, {
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Fullstory Sessions"
-                        },
-                        "url":
-                        f"https://github.com/{event_details['username']}"
                     }]
                 }
             }, {
@@ -58,9 +44,6 @@ def event_message(event_details, user_last_activity_date):
                     "image_url":
                     f"https://github.com/{event_details['username']}.png",
                     "alt_text": f"{event_details['username']} avatar"
-                }, {
-                    "type": "plain_text",
-                    "text": "pymetrics Sep 2021 - Present"
                 }]
             }]
         }]
