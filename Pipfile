@@ -17,6 +17,7 @@ pytest-mock = "*"
 pytest = "*"
 mock = "*"
 pytest-cov = "*"
+freezegun = "*"
 
 [requires]
 python_version = "3.7"

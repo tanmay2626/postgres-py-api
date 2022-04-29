@@ -5,6 +5,7 @@ from app.templates.event import event_message
 from app.templates.signup import signup_message
 from app.templates.event_reply import event_reply
 from app.crud import create_user_event, create_user_signup_entry
+from freezegun import freeze_time
 
 
 def test_signup_and_event_message(database, mocker):
@@ -77,6 +78,7 @@ def test_signup_and_event_message(database, mocker):
     assert client.chat_postMessage.call_count == 3
 
 
+@freeze_time("2022-04-27")
 def test_event_reply_message(database, mocker):
 
     event_record = {
@@ -84,7 +86,7 @@ def test_event_reply_message(database, mocker):
         'events':
         ['failed stage #2 of the redis course using Python. Delay: 4s.'],
         'parent_event_count': 1,
-        'date': '2022-04-28',
+        'date': '2022-04-27',
         'msg_id': 122,
     }
     signin_record = {
@@ -163,7 +165,7 @@ def test_event_reply_message(database, mocker):
     call2 = mocker.call(channel=config.event_channel_id,
                         ts='122',
                         attachments=event_message(event_detail,
-                                                  '2022-04-28')["attachments"])
+                                                  '2022-04-27')["attachments"])
     call3 = mocker.call(
         channel=config.event_channel_id,
         ts='1',
