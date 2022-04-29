@@ -16,7 +16,7 @@ channel_list = {
     'events': config.event_channel_id,
 }
 
-client = WebClient(token=config.bearer_token)
+client = WebClient(token=config.slack_token)
 
 
 def get_signup_content_block(user_details):
@@ -49,11 +49,13 @@ def fetch_log_data(from_time, to_time, pagination_id=None):
     }
     response = requests.get(log_dna_export_url,
                             params=params,
-                            auth=('slack-bot', config.slack_bot_auth))
+                            auth=(config.logdna_key, config.logdna_token))
+
+    if 'error' in response.json():
+        return []
+
     log_data = response.json()
-
     local_data.extend(log_data['lines'])
-
     if log_data['pagination_id'] == None:
         return local_data
     else:
@@ -82,7 +84,7 @@ def send_slack_reply_message(channel_type, parent_msg_id, event_details):
     try:
         result = client.chat_postMessage(
             channel=channel,
-            ts=parent_msg_id,
+            thread_ts=parent_msg_id,
             attachments=message_content["attachments"])
         return result.get("ts")
     except SlackApiError as e:
