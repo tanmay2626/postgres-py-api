@@ -3,9 +3,11 @@ from app.helpers import client
 from app.config import config
 from app.templates.event import event_message
 from app.templates.signup import signup_message
+from app.templates.event_reply import event_reply
+from app.crud import create_user_event, create_user_signup_entry
 
 
-def test_slack_output_expected_behaviour(setup, mocker):
+def test_signup_and_event_message(database, mocker):
     #arrage
     log_dna_events = [{
         'message':
@@ -29,28 +31,28 @@ def test_slack_output_expected_behaviour(setup, mocker):
     process(log_dna_events)
 
     #assert
-    user_details_user1 = {
-        "username":
+    user_detail_user1 = {
+        'username':
         'Test_SlawaShev',
-        "primary_email":
+        'primary_email':
         'shevslawa@gmail.com',
-        "other_email":
+        'other_email':
         ['xyx@outlook.com', '37626862+SlawaShev@users.noreply.github.com'],
-        "fullstory_link":
+        'fullstory_link':
         '',
-        "mixpanel_link":
+        'mixpanel_link':
         '',
-        "events":
+        'events':
         ['failed stage #2 of the redis course using Python. Delay: 4s.'],
     }
-    event_details_user1 = {
+    event_detail_user1 = {
         'username': 'Test_SlawaShev',
         'events':
         ['failed stage #2 of the redis course using Python. Delay: 4s.'],
         'parent_event_count': 1,
         'user_last_activity_date': None
     }
-    event_details_user2 = {
+    event_detail_user2 = {
         'username':
         'Test_Fearkin',
         'events': [
@@ -62,14 +64,110 @@ def test_slack_output_expected_behaviour(setup, mocker):
         None
     }
     call1 = mocker.call(channel=config.event_channel_id,
-                        attachments=event_message(event_details_user1,
+                        attachments=event_message(event_detail_user1,
                                                   None)["attachments"])
     call2 = mocker.call(channel=config.event_channel_id,
-                        attachments=event_message(event_details_user2,
+                        attachments=event_message(event_detail_user2,
                                                   None)["attachments"])
     call3 = mocker.call(
         channel=config.signup_channel_id,
-        attachments=signup_message(user_details_user1)["attachments"])
+        attachments=signup_message(user_detail_user1)["attachments"])
 
-    client.chat_postMessage.assert_has_calls([call1, call2, call3])
+    assert client.chat_postMessage.call_args_list == [call1, call2, call3]
+    assert client.chat_postMessage.call_count == 3
+
+
+def test_event_reply_message(database, mocker):
+
+    event_record = {
+        'username': 'Test_Fearkin',
+        'events':
+        ['failed stage #2 of the redis course using Python. Delay: 4s.'],
+        'parent_event_count': 1,
+        'date': '2022-04-28',
+        'msg_id': 122,
+    }
+    signin_record = {
+        'username': 'Test_Fearkin',
+        'events':
+        ['failed stage #2 of the redis course using Python. Delay: 4s.'],
+        'primary_email': 'fearkin@gmail.com',
+        'other_email': [],
+        'msg_id': 1,
+        'fullstory_link': '',
+        'mixpanel_link': ''
+    }
+    create_user_event(database.session, event_record)
+    create_user_signup_entry(database.session, signin_record)
+
+    #arrage
+    log_dna_events = [{
+        'message':
+        "[analytics_event] viewed: Test_Fearkin viewed the course list page."
+    }, {
+        'message':
+        "[analytics_event] violated_daily_limit: Test_Fearkin violated the daily limit when completing stage #4 of the redis challenge."
+    }]
+    client.chat_postMessage = mocker.Mock(side_effect=[{
+        'ts': 123
+    }, {
+        'ts': 124
+    }, {
+        'ts': 2
+    }])
+
+    #act
+    process(log_dna_events)
+
+    #assert
+    event_detail = {
+        'username':
+        'Test_Fearkin',
+        'events': [
+            'failed stage #2 of the redis course using Python. Delay: 4s.',
+            'viewed the course list page.',
+            'violated the daily limit when completing stage #4 of the redis challenge.'
+        ],
+        'parent_event_count':
+        1,
+    }
+    event_reply_detail = {
+        'username':
+        'Test_Fearkin',
+        'events': [
+            'viewed the course list page.',
+            'violated the daily limit when completing stage #4 of the redis challenge.'
+        ],
+    }
+    signin_detail = {
+        'username':
+        'Test_Fearkin',
+        'primary_email':
+        'fearkin@gmail.com',
+        'other_email': [],
+        'fullstory_link':
+        '',
+        'mixpanel_link':
+        '',
+        'events': [
+            'failed stage #2 of the redis course using Python. Delay: 4s.',
+            'viewed the course list page.',
+            'violated the daily limit when completing stage #4 of the redis challenge.'
+        ],
+    }
+
+    call1 = mocker.call(
+        channel=config.event_channel_id,
+        thread_ts='122',
+        attachments=event_reply(event_reply_detail)["attachments"])
+    call2 = mocker.call(channel=config.event_channel_id,
+                        ts='122',
+                        attachments=event_message(event_detail,
+                                                  '2022-04-28')["attachments"])
+    call3 = mocker.call(
+        channel=config.event_channel_id,
+        ts='1',
+        attachments=signup_message(signin_detail)["attachments"])
+
+    assert client.chat_postMessage.call_args_list == [call1, call2, call3]
     assert client.chat_postMessage.call_count == 3

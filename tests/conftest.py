@@ -5,10 +5,10 @@ import os
 
 
 @pytest.fixture
-def setup():
+def database():
     connection.init()
 
-    yield
+    yield connection
 
     for table in reversed(Base.metadata.sorted_tables):
         connection.session.execute(table.delete())

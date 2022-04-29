@@ -13,5 +13,6 @@ This is the backend for codecrafters user events slack bot.
 
 ## Test
 
+- Test db: `python3 db_test_init.py`
 - Run `pytest`
 - Coverage: `pytest --cov`
