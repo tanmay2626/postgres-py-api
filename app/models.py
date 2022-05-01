@@ -72,3 +72,11 @@ class Job(Base):
     logdna_start_time = Column(DateTime(timezone=True), default=func.now())
     logdna_end_time = Column(DateTime(timezone=True), default=func.now())
     status = Column('status', Enum(statusEnum))
+
+class Error(Base):
+    __tablename__ = "error"
+
+    id = Column(Integer, Identity(start=1), primary_key=True, index=True)
+    time = Column(DateTime(timezone=True))
+    type = Column(String, unique=True)
+    error = Column(String, unique=True)
