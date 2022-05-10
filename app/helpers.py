@@ -97,7 +97,7 @@ def update_slack_message(channel_type, parent_msg_id, details):
     message_content = get_signup_content_block(details) if (
         channel_type == 'signup') else get_event_content_block(details)
     try:
-        result = client.chat_postMessage(
+        result = client.chat_update(
             channel=channel,
             ts=parent_msg_id,
             attachments=message_content["attachments"])

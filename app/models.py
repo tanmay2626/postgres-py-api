@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ARRAY, DATE, Enum, DateTime, func
+from sqlalchemy import Column, Integer, String, ARRAY, DATE, Enum, DateTime
 from sqlalchemy.sql.schema import Identity
 from sqlalchemy.ext.declarative import declarative_base
 import enum
@@ -67,10 +67,13 @@ class Job(Base):
     __tablename__ = "job"
 
     id = Column(Integer, Identity(start=1), primary_key=True, index=True)
-    start_time = Column(DateTime(timezone=True), default=func.now())
-    end_time = Column(DateTime(timezone=True), default=func.now())
-    logdna_start_time = Column(DateTime(timezone=True), default=func.now())
-    logdna_end_time = Column(DateTime(timezone=True), default=func.now())
+    start_time = Column(DateTime(timezone=True))
+    end_time = Column(DateTime(timezone=True))
+    logdna_start_time = Column(String) #ms
+    logdna_end_time = Column(String) #ms
+    duration = Column(String)
+    logdna_duration = Column(String) #sec
+    event_count = Column(Integer)
     status = Column('status', Enum(statusEnum))
 
 class Error(Base):

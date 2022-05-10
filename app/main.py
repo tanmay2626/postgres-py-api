@@ -1,9 +1,15 @@
 from app.database import connection
-import datetime
 from app.helpers import fetch_log_data, separate_event_list, send_slack_message, update_slack_message, send_slack_reply_message
 from app.crud import get_user_event_by_username, create_user_event, get_user_by_username, update_user_signup_events, create_user_signup_entry, update_user_events
 import time
-from dotenv import load_dotenv
+from datetime import datetime, timedelta, date
+from dataclasses import dataclass
+from app.models import Job
+import sys
+import pytz
+
+timezone = pytz.utc
+event_count = 0
 
 
 def process(log_dna_events):
@@ -13,12 +19,14 @@ def process(log_dna_events):
 
 
 def process_other_events(other_events):
+    global event_count
     for user in other_events:
+        event_count = event_count + len(other_events[user])
         event_details = {
             'username': user,
             'events': other_events[user],
             'parent_event_count': len(other_events[user]),
-            'date': datetime.date.today()
+            'date': date.today()
         }
         existing_event_data = get_user_event_by_username(
             connection.session, user, event_details['date'])
@@ -40,8 +48,10 @@ def process_other_events(other_events):
 
 
 def process_signin_events(signup_events, other_events):
+    global event_count
     for user in other_events:
         if user in signup_events:
+            event_count = event_count + 1
             user_details = {
                 "username": signup_events[user]['name'],
                 "primary_email": signup_events[user]['primary_email'],
@@ -74,8 +84,46 @@ def process_signin_events(signup_events, other_events):
                 print(user + " not available !")
         time.sleep(1)
 
+def demo_run():
+    connection.init()
+    current_time_sec = time.time_ns() // 1_000_000_000
+    log_dna_events = fetch_log_data(current_time_sec - 86400, current_time_sec)
+    process(log_dna_events)
+
+def run():
+    global event_count
+    connection.init()
+    current_time_ms = time.time_ns() // 1_000_000
+    job = Job(logdna_start_time = current_time_ms - 60_000, #10min 
+        logdna_end_time = current_time_ms, start_time = datetime.now(timezone), status='running')
+    while(True):
+        event_count = 0
+        connection.session.add(job)
+        connection.session.commit()
+
+        log_dna_events = fetch_log_data(int(job.logdna_start_time), int(job.logdna_end_time))
+        process(log_dna_events)
+
+        job.end_time = datetime.now(timezone)
+        job.status = 'success'
+        job.duration = job.end_time - job.start_time
+        job.logdna_duration = (int(job.logdna_end_time) - int(job.logdna_start_time))/1000
+        job.event_count = event_count
+        connection.session.commit()
+
+        current_time_ms = time.time_ns() // 1_000_000
+        if current_time_ms - int(job.logdna_end_time)  < 60_000:  #1min
+            time.sleep((60_000 - (current_time_ms - int(job.logdna_end_time)))/1000 )
+
+        current_time_ms = time.time_ns() // 1_000_000
+        job = Job(logdna_start_time = int(job.logdna_end_time),
+        logdna_end_time = current_time_ms, start_time = datetime.now(timezone), status='running')
+
 
 if __name__ == "__main__":
-    connection.init()
-    log_dna_events = fetch_log_data(1650890663, 1650977063)
-    process(log_dna_events)
+
+    if not(len(sys.argv) == 2 and sys.argv[1] == 'prod'):
+        demo_run()
+        exit()
+
+    run()
