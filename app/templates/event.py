@@ -1,7 +1,7 @@
 new_line = '\n'
 
 
-def event_message(event_details, user_last_activity_date):
+def event_message(event_details, user_last_activity_date, user_signup_date):
     return {
         "attachments": [{
             "fallback":
@@ -14,7 +14,7 @@ def event_message(event_details, user_last_activity_date):
                     "type":
                     "mrkdwn",
                     "text":
-                    f"<https://github.com/{event_details['username']}|{event_details['username']}> performed *{len(event_details['events'])}* events today.\n\n*Last Activity*\n {user_last_activity_date}\n\n*Signed Up*\n {'x'} years ago"
+                    f"<https://github.com/{event_details['username']}|{event_details['username']}> performed *{len(event_details['events'])}* events today.\n\n*Last Activity*\n {user_last_activity_date}\n\n*Signed Up*\n {user_signup_date}"
                 },
                 "accessory": {
                     "type":

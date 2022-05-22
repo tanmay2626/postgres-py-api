@@ -14,8 +14,8 @@ event_count = 0
 
 def process(log_dna_events):
     signup_events, other_events = separate_event_list(log_dna_events)
-    process_other_events(other_events)
     process_signin_events(signup_events, other_events)
+    process_other_events(other_events)
 
 
 def process_other_events(other_events):
@@ -59,6 +59,7 @@ def process_signin_events(signup_events, other_events):
                 "fullstory_link": "",
                 "mixpanel_link": "",
                 "events": signup_events[user]['events'][:10],
+                "timestamp": signup_events[user]['signup_timestamp']
             }
             # Todo - Make call to Fullstory API to get the details
             # Todo - Make call to Mixpanel API to get the details

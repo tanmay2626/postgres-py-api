@@ -1,6 +1,6 @@
 import requests
 import json
-from app.crud import get_user_last_activity_date
+from app.crud import get_user_last_activity_date, get_user_signup_date
 from app.database import connection
 from collections import OrderedDict
 from slack_sdk import WebClient
@@ -26,9 +26,9 @@ def get_signup_content_block(user_details):
 def get_event_content_block(event_details):
     user_last_activity_date = get_user_last_activity_date(
         connection.session, event_details['username'])
-    # Todo - Get user signup date from DB
+    user_signup_date = get_user_signup_date(connection.session, event_details['username'])
     new_line = '\n'
-    return event_message(event_details, user_last_activity_date)
+    return event_message(event_details, user_last_activity_date, user_signup_date)
 
 
 def get_event_reply_content_block(event_details):
@@ -111,6 +111,7 @@ def separate_event_list(log_dna_event_list):
     signup_events = OrderedDict()
     other_events = OrderedDict()
     for log_item in log_dna_event_list:
+        timestamp = log_item['timestamp']
         log_message = log_item['message']
         event_message = log_message[log_message.index(":") + 1:].strip()
         user_name, event_message = event_message.split(" ", 1)
@@ -123,7 +124,8 @@ def separate_event_list(log_dna_event_list):
                 "name": user_name,
                 "primary_email": user_primary_email,
                 "other_email": user_other_email,
-                "events": []
+                "events": [],
+                "signup_timestamp": timestamp
             }
         else:
             if user_name in other_events:

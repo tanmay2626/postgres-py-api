@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ARRAY, DATE, Enum, DateTime
+from sqlalchemy import TIMESTAMP, Column, Integer, String, ARRAY, DATE, Enum, DateTime
 from sqlalchemy.sql.schema import Identity
 from sqlalchemy.ext.declarative import declarative_base
 import enum
@@ -17,11 +17,12 @@ class User(Base):
     other_email = Column(ARRAY(String), nullable=True)
     events = Column(ARRAY(String), nullable=True)
     msg_id = Column(String, unique=True, nullable=False)
+    timestamp = Column(TIMESTAMP)
 
     def __repr__(self):
-        return "<User(id='%d, username='%s', fullstory_link='%s', mixpanel_link='%s, msg_id='%s')>" % (
+        return "<User(id='%d, username='%s', fullstory_link='%s', mixpanel_link='%s, msg_id='%s', timestamp='%s')>" % (
             self.id, self.username, self.fullstory_link, self.mixpanel_link,
-            self.msg_id)
+            self.msg_id, self.timestamp)
 
     def toDict(self):
         return {
@@ -33,6 +34,7 @@ class User(Base):
             'other_email': self.other_email,
             'events': self.events,
             'msg_id': self.msg_id,
+            'timestamp': self.timestamp
         }
 
 
