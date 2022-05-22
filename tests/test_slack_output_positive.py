@@ -8,6 +8,7 @@ from app.crud import create_user_event, create_user_signup_entry
 from freezegun import freeze_time
 
 # TODO add only sigup test case
+# TODO add exeception test case
 
 
 def test_signup_and_event_message(database, mocker):

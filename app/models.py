@@ -84,5 +84,5 @@ class Error(Base):
 
     id = Column(Integer, Identity(start=1), primary_key=True, index=True)
     time = Column(DateTime(timezone=True))
-    type = Column(String, unique=True)
-    error = Column(String, unique=True)
+    type = Column(String)
+    error = Column(String)

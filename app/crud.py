@@ -1,6 +1,7 @@
 from sqlalchemy import func, desc
 from sqlalchemy.orm import Session
-from app.models import User, Event
+from app.models import User, Event, Error
+from datetime import datetime
 
 
 def create_user_signup_entry(db: Session, user_details):
@@ -70,3 +71,9 @@ def get_user_last_activity_date(db: Session, username: str):
         return last_event_date.date
     else:
         return last_event_date
+
+
+def create_error(db: Session, type: str, error: str):
+    db_error = Error(time=datetime.now(), type=type, error=str(error))
+    db.add(db_error)
+    db.commit()
