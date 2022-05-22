@@ -7,6 +7,7 @@ from app.templates.event_reply import event_reply
 from app.crud import create_user_event, create_user_signup_entry
 from freezegun import freeze_time
 
+# TODO add only sigup test case
 
 def test_signup_and_event_message(database, mocker):
     #arrage
@@ -112,10 +113,13 @@ def test_event_reply_message(database, mocker):
     }]
     client.chat_postMessage = mocker.Mock(side_effect=[{
         'ts': 123
-    }, {
+    }])
+
+    client.chat_update = mocker.Mock(side_effect=[{
         'ts': 124
-    }, {
-        'ts': 2
+    },
+     {
+        'ts': 125
     }])
 
     #act
@@ -158,18 +162,21 @@ def test_event_reply_message(database, mocker):
         ],
     }
 
-    call1 = mocker.call(
+    reply_call = mocker.call(
         channel=config.event_channel_id,
         thread_ts='122',
         attachments=event_reply(event_reply_detail)["attachments"])
-    call2 = mocker.call(channel=config.event_channel_id,
+    update_event_call = mocker.call(channel=config.event_channel_id,
                         ts='122',
                         attachments=event_message(event_detail,
                                                   '2022-04-27')["attachments"])
-    call3 = mocker.call(
+    update_signup_call = mocker.call(
         channel=config.event_channel_id,
         ts='1',
         attachments=signup_message(signin_detail)["attachments"])
 
-    assert client.chat_postMessage.call_args_list == [call1, call2, call3]
-    assert client.chat_postMessage.call_count == 3
+    assert client.chat_postMessage.call_args_list == [reply_call]
+    assert client.chat_postMessage.call_count == 1
+
+    assert client.chat_update.call_args_list == [update_event_call,update_signup_call]
+    assert client.chat_update.call_count == 2
