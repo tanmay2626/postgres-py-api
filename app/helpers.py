@@ -26,9 +26,11 @@ def get_signup_content_block(user_details):
 def get_event_content_block(event_details):
     user_last_activity_date = get_user_last_activity_date(
         connection.session, event_details['username'])
-    user_signup_date = get_user_signup_date(connection.session, event_details['username'])
+    user_signup_date = get_user_signup_date(connection.session,
+                                            event_details['username'])
     new_line = '\n'
-    return event_message(event_details, user_last_activity_date, user_signup_date)
+    return event_message(event_details, user_last_activity_date,
+                         user_signup_date)
 
 
 def get_event_reply_content_block(event_details):
@@ -97,10 +99,9 @@ def update_slack_message(channel_type, parent_msg_id, details):
     message_content = get_signup_content_block(details) if (
         channel_type == 'signup') else get_event_content_block(details)
     try:
-        result = client.chat_update(
-            channel=channel,
-            ts=parent_msg_id,
-            attachments=message_content["attachments"])
+        result = client.chat_update(channel=channel,
+                                    ts=parent_msg_id,
+                                    attachments=message_content["attachments"])
         return result.get("ts")
     except SlackApiError as e:
         print(f"Error: {e}")

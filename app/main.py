@@ -85,45 +85,55 @@ def process_signin_events(signup_events, other_events):
                 print(user + " not available !")
         time.sleep(1)
 
+
 def demo_run():
     connection.init()
     current_time_sec = time.time_ns() // 1_000_000_000
     log_dna_events = fetch_log_data(current_time_sec - 86400, current_time_sec)
     process(log_dna_events)
 
+
 def run():
     global event_count
     connection.init()
     current_time_ms = time.time_ns() // 1_000_000
-    job = Job(logdna_start_time = current_time_ms - 60_000, #10min 
-        logdna_end_time = current_time_ms, start_time = datetime.now(timezone), status='running')
-    while(True):
+    job = Job(
+        logdna_start_time=current_time_ms - 60_000,  #10min 
+        logdna_end_time=current_time_ms,
+        start_time=datetime.now(timezone),
+        status='running')
+    while (True):
         event_count = 0
         connection.session.add(job)
         connection.session.commit()
 
-        log_dna_events = fetch_log_data(int(job.logdna_start_time), int(job.logdna_end_time))
+        log_dna_events = fetch_log_data(int(job.logdna_start_time),
+                                        int(job.logdna_end_time))
         process(log_dna_events)
 
         job.end_time = datetime.now(timezone)
         job.status = 'success'
         job.duration = job.end_time - job.start_time
-        job.logdna_duration = (int(job.logdna_end_time) - int(job.logdna_start_time))/1000
+        job.logdna_duration = (int(job.logdna_end_time) -
+                               int(job.logdna_start_time)) / 1000
         job.event_count = event_count
         connection.session.commit()
 
         current_time_ms = time.time_ns() // 1_000_000
-        if current_time_ms - int(job.logdna_end_time)  < 60_000:  #1min
-            time.sleep((60_000 - (current_time_ms - int(job.logdna_end_time)))/1000 )
+        if current_time_ms - int(job.logdna_end_time) < 60_000:  #1min
+            time.sleep(
+                (60_000 - (current_time_ms - int(job.logdna_end_time))) / 1000)
 
         current_time_ms = time.time_ns() // 1_000_000
-        job = Job(logdna_start_time = int(job.logdna_end_time),
-        logdna_end_time = current_time_ms, start_time = datetime.now(timezone), status='running')
+        job = Job(logdna_start_time=int(job.logdna_end_time),
+                  logdna_end_time=current_time_ms,
+                  start_time=datetime.now(timezone),
+                  status='running')
 
 
 if __name__ == "__main__":
 
-    if not(len(sys.argv) == 2 and sys.argv[1] == 'prod'):
+    if not (len(sys.argv) == 2 and sys.argv[1] == 'prod'):
         demo_run()
         exit()
 

@@ -11,8 +11,7 @@ def create_user_signup_entry(db: Session, user_details):
                    other_email=user_details['other_email'],
                    events=user_details['events'],
                    msg_id=user_details['msg_id'],
-                   timestamp = user_details['timestamp']
-                   )
+                   timestamp=user_details['timestamp'])
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -23,12 +22,14 @@ def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username,
                                  func.cardinality(User.events) < 10).first()
 
+
 def get_user_signup_date(db: Session, username: str):
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         return "Not available"
     else:
         return user.timestamp.date().isoformat()
+
 
 def update_user_signup_events(db: Session, username: str, events):
     user = db.query(User).filter(User.username == username).first()

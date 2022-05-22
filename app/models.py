@@ -71,12 +71,13 @@ class Job(Base):
     id = Column(Integer, Identity(start=1), primary_key=True, index=True)
     start_time = Column(DateTime(timezone=True))
     end_time = Column(DateTime(timezone=True))
-    logdna_start_time = Column(String) #ms
-    logdna_end_time = Column(String) #ms
+    logdna_start_time = Column(String)  #ms
+    logdna_end_time = Column(String)  #ms
     duration = Column(String)
-    logdna_duration = Column(String) #sec
+    logdna_duration = Column(String)  #sec
     event_count = Column(Integer)
     status = Column('status', Enum(statusEnum))
+
 
 class Error(Base):
     __tablename__ = "error"
