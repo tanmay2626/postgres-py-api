@@ -4,7 +4,8 @@ This is the backend for codecrafters user events slack bot.
 - `python3 db_init.py`
 
 ## Run
-- `python3 -m app.main`
+- demo run: `python3 -m app.main`
+- prod run: `python3 -m app.main prod`
 
 ## Lint & format
 
