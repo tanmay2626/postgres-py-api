@@ -56,7 +56,7 @@ def process_other_events(other_events):
 
 def process_signin_events(signup_events, other_events):
     global event_count
-    for user in other_events:
+    for user in set(list(signup_events.keys()) + list(other_events.keys())):
         try:
             if user in signup_events:
                 event_count = event_count + 1
